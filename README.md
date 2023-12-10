@@ -61,6 +61,8 @@ The Read_Mapping handler uses STAR to map reads to the genome indexed in step 3.
 
 This handler can accept as input EITHER a directory or a text-file list of forward samples (it will find the reverse samples based on the naming suffix specified in the config file)
 
+**We are using -GeneCounts flag of STAR (specified in Config file) which will also quanitfy our transcripts and the output will be in a `.tab` file (one file for each sample) with the rest of the STAR output. These are the files that we will use to analyze our expression data, so this is the most important output from this step.**
+
 ### Option for 2-pass mapping
 STAR can perform a 2-pass mapping strategy to increase mapping sensitivity around novel splice junctions. This works by running a 1st mapping pass for all samples with the "usual" parameters to identify un-annotated splice junctions. Then mapping is re-run, using the junctions detected in the first pass (in addition to the annotated junctions specified in the genome annotation file). This 2-pass mapping strategy is recommended by GATK and ENCODE best-practices for better alignments around novel splice junctions.
 
