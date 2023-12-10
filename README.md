@@ -112,14 +112,15 @@ Two alignment files are output from STAR with this handler - one alignment file 
 The output of STAR GeneCounts must be properly formatted to read into DESEq2. The file format needs to be changed as the GeneCounts output has 4 columns: 1-GeneID, 2-unstranded counts, 3-forward strand counts, and 4-reverse strand counts. DESeq can only read in files with 2 columns (GeneID and one count column). The ```prepare_DESeq_input.sh``` extracts the first and fourth columns from the files (the data we are using is reverse-stranded).
 
 # Part II: Expression Analysis 
-This will mostly be in R 
+This will mostly be in R using [DESeq2](https://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html) for differential expression analysis and [WGCNA](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-9-559) for a co-expression network analysis. 
 
 ## 0. Pre-process data into matrix
-Load the GeneCount data and collapse technical replicates (if applicaple)
+Load the GeneCount data into a DESeq dataset and collapse technical replicates (if applicaple)
 `load_GC_data_and_sum_reps.R`
 ## 1. Visualize data in an MDS plot
 `plot_MDS.R`
-## 2. Correct for unwanted variation using ComBat-Seq and run DEseq
+This will give us an idea of the relationship between our samples. In the next step we will be correcting for varaition, but it is important to visualize at this step.
+## 2. Correct for unwanted variation using [ComBat-Seq](https://github.com/zhangyuqing/ComBat-seq) and run DEseq
 `run_DGE_deseq_sunflower_inflo_combatseq.R`
 `analyze_DGE_deseq_sunflower_inflo_combatseq.R`
 ## 4. Run and analyze WGCNA
