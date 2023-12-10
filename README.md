@@ -1,5 +1,5 @@
 # dev_RNAseq
-A pipeline for analyzing expression across developmental stages 
+A pipeline for analyzing expression across developmental stages. 
 Built from Emily Dittmar's sunflower expression pipeline: https://github.com/EDitt/Sunflower_RNAseq
 
 
