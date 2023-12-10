@@ -122,6 +122,7 @@ Load the GeneCount data into a DESeq dataset and collapse technical replicates (
 This will give us an idea of the relationship between our samples. In the next step we will be correcting for varaition, but it is important to visualize at this step.
 ## 2. Correct for unwanted variation using [ComBat-Seq](https://github.com/zhangyuqing/ComBat-seq) and run DEseq
 `run_DGE_deseq_sunflower_inflo_combatseq.R`
+## 3. Visualize DE in an Upset Plot
 `analyze_DGE_deseq_sunflower_inflo_combatseq.R`
 ## 4. Run and analyze WGCNA
 
