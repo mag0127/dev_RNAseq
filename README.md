@@ -108,15 +108,19 @@ If you have sequence data from the same sample across multiple lanes/runs, the b
 Two alignment files are output from STAR with this handler - one alignment file in genomic coordinates and one translated into transcript coordinates (e.g.`*Aligned.toTranscriptome.out.bam`). The default format of the former is an unsorted SAM file. If you plan on using the genomic coordinate alignments for SNP calling, you have the option of getting these output as coordinate-sorted BAM files (similar to the `samtools sort` command) by putting a "yes" for the `GENOMIC_COORDINATE_BAMSORTED` variable in the config. Note that this will add significant computational time and memory.
 
 ## Step 5: Prepare for DESEq2
-The output of STAR GeneCounts must be properly formatted to read into DESEq2
 
-run `prepare_DESEq_input.sh`
+The output of STAR GeneCounts must be properly formatted to read into DESEq2. The file format needs to be changed as the GeneCounts output has 4 columns: 1-GeneID, 2-unstranded counts, 3-forward strand counts, and 4-reverse strand counts. DESeq can only read in files with 2 columns (GeneID and one count column). The ```prepare_DESeq_input.sh``` extracts the first and fourth columns from the files (the data we are using is reverse-stranded).
 
 # Part II: Expression Analysis 
 This will mostly be in R 
 
+## 0. Pre-process data into matrix
+Load the GeneCount data and collapse technical replicates (if applicaple)
+`load_GC_data_and_sum_reps.R`
 ## 1. Visualize data in an MDS plot
-## 2. Correct for unwanted variation using ComBat-Seq
-## 3. Run and analyze DESeq
+`plot_MDS.R`
+## 2. Correct for unwanted variation using ComBat-Seq and run DEseq
+`run_DGE_deseq_sunflower_inflo_combatseq.R`
+`analyze_DGE_deseq_sunflower_inflo_combatseq.R`
 ## 4. Run and analyze WGCNA
 
