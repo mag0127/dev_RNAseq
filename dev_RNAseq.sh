@@ -2,8 +2,8 @@
 
 set -o pipefail
 
-#   Where is 'sunflower_rnaseq' located?
-SUNFLOWER_RNASEQ=$(pwd -P)
+#   Where is 'dev_rnaseq' located?
+DEV_RNASEQ=$(pwd -P)
 
 ROUTINE="$1" # What routine are we running?
 CONFIG="$2" # Where is our config file?
@@ -18,20 +18,20 @@ else # If it doesn't
 fi
 
 #   Where do we output the standard error and standard output files?
-ERROR="${SUNFLOWER_RNASEQ}"/ErrorFiles/"${PROJECT}"
+ERROR="${DEV_RNASEQ}"/ErrorFiles/"${PROJECT}"
 mkdir -p "${ERROR}"
 
 
-#   Run Sunflower_RNAseq
+#   Run dev_RNAseq
 case "${ROUTINE}" in
     1 | Quality_Assessment)
         echo "$(basename $0): Assessing quality..." >&2
         if [[ "$QUEUE" == "PBS" ]]; then
             echo "PBS is our workload manager/job scheduler."
-            echo "source ${CONFIG} && source ${SUNFLOWER_RNASEQ}/Quality_Assessment.sh" | qsub -l "${QA_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Quality_Assessment
+            echo "source ${CONFIG} && source ${DEV_RNASEQ}/Quality_Assessment.sh" | qsub -l "${QA_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Quality_Assessment
             elif [[ "${QUEUE}" == "Slurm" ]]; then
                 echo "Slurm is our workload manager/job scheduler."
-                sbatch --job-name=${PROJECT}_Quality_Assessment ${QA_SBATCH} --output=${ERROR}/QA_slurm-%j.out --export=QA_INPUTDIR=${QA_INPUTDIR},SUFFIX=${SUFFIX},QA_OUTPUTDIR=${QA_OUTPUTDIR},QA_TEMP=${QA_TEMP} ${SUNFLOWER_RNASEQ}/Quality_Assessment.sh
+                sbatch --job-name=${PROJECT}_Quality_Assessment ${QA_SBATCH} --output=${ERROR}/QA_slurm-%j.out --export=QA_INPUTDIR=${QA_INPUTDIR},SUFFIX=${SUFFIX},QA_OUTPUTDIR=${QA_OUTPUTDIR},QA_TEMP=${QA_TEMP} ${DEV_RNASEQ}/Quality_Assessment.sh
             else
                 echo "QUEUE variable in config must be set to PBS or Slurm. Please set to one of the two depending on the workload manager your cluster uses. Exiting..."
                 exit 1
@@ -59,12 +59,12 @@ case "${ROUTINE}" in
         echo "Max array index is ${Maxarray}">&2
         if [[ "$QUEUE" == "PBS" ]]; then
             echo "PBS is our workload manager/job scheduler."
-            echo "source ${CONFIG} && source ${SUNFLOWER_RNASEQ}/Trimm.sh" | qsub -l "${AT_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Adapter_Trimming -t 1-"${Maxarray}"
+            echo "source ${CONFIG} && source ${DEV_RNASEQ}/Trimm.sh" | qsub -l "${AT_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Adapter_Trimming -t 1-"${Maxarray}"
         elif [[ "${QUEUE}" == "Slurm" ]]; then
             echo "Slurm is our workload manager/job scheduler."
             Slurm_Maxarray=$(($Maxarray-1))
             sbatch --job-name=${PROJECT}_Adapter_Trimming ${AT_SBATCH} --output=${ERROR}/AT_slurm_%A_%a.out --array=0-${Slurm_Maxarray} \
-            --export=QUEUE=${QUEUE},JOB_LOG=${JOB_LOG},AT_INPUT=${AT_INPUT},AT_OUTPUTDIR=${AT_OUTPUTDIR},ADAPTERFILE=${ADAPTERFILE},FORWARD_NAMING=${FORWARD_NAMING},REVERSE_NAMING=${REVERSE_NAMING},SEEDMISMATCH=${SEEDMISMATCH},PALINDROMECLIP=${PALINDROMECLIP},SIMPLECLIP=${SIMPLECLIP},MINADAPTERLEN=${MINADAPTERLEN},KEEPREADS=${KEEPREADS},LEADCUT=${LEADCUT},TRAILCUT=${TRAILCUT},MINLENGTH=${MINLENGTH},PE=${PE} ${SUNFLOWER_RNASEQ}/Trimm.sh
+            --export=QUEUE=${QUEUE},JOB_LOG=${JOB_LOG},AT_INPUT=${AT_INPUT},AT_OUTPUTDIR=${AT_OUTPUTDIR},ADAPTERFILE=${ADAPTERFILE},FORWARD_NAMING=${FORWARD_NAMING},REVERSE_NAMING=${REVERSE_NAMING},SEEDMISMATCH=${SEEDMISMATCH},PALINDROMECLIP=${PALINDROMECLIP},SIMPLECLIP=${SIMPLECLIP},MINADAPTERLEN=${MINADAPTERLEN},KEEPREADS=${KEEPREADS},LEADCUT=${LEADCUT},TRAILCUT=${TRAILCUT},MINLENGTH=${MINLENGTH},PE=${PE} ${DEV_RNASEQ}/Trimm.sh
         else
                     echo "QUEUE variable in config must be set to PBS or Slurm. Please set to one of the two depending on the workload manager your cluster uses. Exiting..."
                     exit 1
@@ -74,10 +74,10 @@ case "${ROUTINE}" in
         echo "$(basename $0): Generating a genome index from ${ANNOTATION_FORMAT} annotation..." >&2
         if [[ "$QUEUE" == "PBS" ]]; then
             echo "PBS is our workload manager/job scheduler."
-            echo "source ${CONFIG} && source ${SUNFLOWER_RNASEQ}/Genome_Index.sh" | qsub -l "${GI_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Genome_Index
+            echo "source ${CONFIG} && source ${DEV_RNASEQ}/Genome_Index.sh" | qsub -l "${GI_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Genome_Index
         elif [[ "${QUEUE}" == "Slurm" ]]; then
             echo "Slurm is our workload manager/job scheduler."
-            sbatch --job-name=${PROJECT}_Genome_Index ${GI_SBATCH} --output=${ERROR}/GI_slurm-%j.out --export=QUEUE=${QUEUE},ANNOTATION_FORMAT=${ANNOTATION_FORMAT},GENE_PARENT=${GENE_PARENT},STAR_FILE=${STAR_FILE},NTHREAD=${NTHREAD},GEN_DIR=${GEN_DIR},GEN_FASTA=${GEN_FASTA},TRANSCRIPT_TAG=${TRANSCRIPT_TAG},GENE_TAG=${GENE_TAG},GEN_ANN=${GEN_ANN},SPLICE_JUN=${SPLICE_JUN} ${SUNFLOWER_RNASEQ}/Genome_Index.sh
+            sbatch --job-name=${PROJECT}_Genome_Index ${GI_SBATCH} --output=${ERROR}/GI_slurm-%j.out --export=QUEUE=${QUEUE},ANNOTATION_FORMAT=${ANNOTATION_FORMAT},GENE_PARENT=${GENE_PARENT},STAR_FILE=${STAR_FILE},NTHREAD=${NTHREAD},GEN_DIR=${GEN_DIR},GEN_FASTA=${GEN_FASTA},TRANSCRIPT_TAG=${TRANSCRIPT_TAG},GENE_TAG=${GENE_TAG},GEN_ANN=${GEN_ANN},SPLICE_JUN=${SPLICE_JUN} ${DEV_RNASEQ}/Genome_Index.sh
             fi
         ;;
     4 | Collect_Junctions)
@@ -115,11 +115,11 @@ case "${ROUTINE}" in
         echo "Max array index is ${Maxarray}">&2
         if [[ "$QUEUE" == "PBS" ]]; then
             echo "PBS is our workload manager/job scheduler."
-            echo "source ${CONFIG} && source ${SUNFLOWER_RNASEQ}/Read_Mapping.sh" | qsub -l "${RM_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Collect_Junctions -V -t 1-"${Maxarray}"
+            echo "source ${CONFIG} && source ${DEV_RNASEQ}/Read_Mapping.sh" | qsub -l "${RM_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Collect_Junctions -V -t 1-"${Maxarray}"
         elif [[ "${QUEUE}" == "Slurm" ]]; then
             echo "Slurm is our workload manager/job scheduler."
             Slurm_Maxarray=$(($Maxarray-1))
-	    sbatch --job-name=${PROJECT}_Collect_Junctions ${RM_SBATCH} --output=${ERROR}/CJ_slurm-%j.out --array=0-${Slurm_Maxarray} --export=QUEUE=${QUEUE},RM_INPUT=${RM_INPUT},CJ_JOB_LOG=${CJ_JOB_LOG},RM_NTHREAD=${RM_NTHREAD},FLOWCELL_NAME=${FLOWCELL_NAME},FORWARD=${FORWARD},CJ_OUTPUTDIR=${CJ_OUTPUTDIR},PE=${PE},REVERSE=${REVERSE},GENOMIC_COORDINATE_BAMSORTED=${GENOMIC_COORDINATE_BAMSORTED},RM_PASS=${RM_PASS},MAX_MIS=${MAX_MIS},MAX_N=${MAX_N},UNMAP_F=${UNMAP_F},MINSCORE_READL=${MINSCORE_READL},MINMATCH_READL=${MINMATCH_READL},SEEDSEARCH=${SEEDSEARCH},PLATFORM=${PLATFORM},GEN_DIR=${GEN_DIR} ${SUNFLOWER_RNASEQ}/Read_Mapping.sh
+	    sbatch --job-name=${PROJECT}_Collect_Junctions ${RM_SBATCH} --output=${ERROR}/CJ_slurm-%j.out --array=0-${Slurm_Maxarray} --export=QUEUE=${QUEUE},RM_INPUT=${RM_INPUT},CJ_JOB_LOG=${CJ_JOB_LOG},RM_NTHREAD=${RM_NTHREAD},FLOWCELL_NAME=${FLOWCELL_NAME},FORWARD=${FORWARD},CJ_OUTPUTDIR=${CJ_OUTPUTDIR},PE=${PE},REVERSE=${REVERSE},GENOMIC_COORDINATE_BAMSORTED=${GENOMIC_COORDINATE_BAMSORTED},RM_PASS=${RM_PASS},MAX_MIS=${MAX_MIS},MAX_N=${MAX_N},UNMAP_F=${UNMAP_F},MINSCORE_READL=${MINSCORE_READL},MINMATCH_READL=${MINMATCH_READL},SEEDSEARCH=${SEEDSEARCH},PLATFORM=${PLATFORM},GEN_DIR=${GEN_DIR} ${DEV_RNASEQ}/Read_Mapping.sh
         else
                 echo "QUEUE variable in config must be set to PBS or Slurm. Please set to one of the two depending on the workload manager your cluster uses. Exiting..."
                 exit 1
@@ -132,10 +132,10 @@ case "${ROUTINE}" in
         echo "$(basename $0): Filtering and concatenating junctions for mapping..." >&2
         if [[ "$QUEUE" == "PBS" ]]; then
             echo "PBS is our workload manager/job scheduler."
-            echo "source ${CONFIG} && source ${SUNFLOWER_RNASEQ}/Filter_Junctions.sh" | qsub -l "${FJ_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Filter_Junctions
+            echo "source ${CONFIG} && source ${DEV_RNASEQ}/Filter_Junctions.sh" | qsub -l "${FJ_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Filter_Junctions
         elif [[ "${QUEUE}" == "Slurm" ]]; then
                 echo "Slurm is our workload manager/job scheduler."
-                sbatch --job-name=${PROJECT}_Filter_Junctions ${FJ_SBATCH} --output=${ERROR}/FJ_slurm-%j.out --export=JUNCTIONDIR=${JUNCTIONDIR},SJ_LISTNAME=${SJ_LISTNAME},SCAFFOLD_STRING=${SCAFFOLD_STRING},REMOVE_NC_JUNK=${REMOVE_NC_JUNK},UNIQUE_NUM=${UNIQUE_NUM} ${SUNFLOWER_RNASEQ}/Filter_Junctions.sh
+                sbatch --job-name=${PROJECT}_Filter_Junctions ${FJ_SBATCH} --output=${ERROR}/FJ_slurm-%j.out --export=JUNCTIONDIR=${JUNCTIONDIR},SJ_LISTNAME=${SJ_LISTNAME},SCAFFOLD_STRING=${SCAFFOLD_STRING},REMOVE_NC_JUNK=${REMOVE_NC_JUNK},UNIQUE_NUM=${UNIQUE_NUM} ${DEV_RNASEQ}/Filter_Junctions.sh
             else
                 echo "QUEUE variable in config must be set to PBS or Slurm. Please set to one of the two depending on the workload manager your cluster uses. Exiting..."
                 exit 1
@@ -198,56 +198,15 @@ fi
         if [[ "$QUEUE" == "PBS" ]]; then
             echo "PBS is our workload manager/job scheduler."
 
-            echo "source ${CONFIG} && source ${SUNFLOWER_RNASEQ}/Read_Mapping.sh" | qsub -l "${RM_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Read_Mapping -V -t 1-"${Maxarray}"
+            echo "source ${CONFIG} && source ${DEV_RNASEQ}/Read_Mapping.sh" | qsub -l "${RM_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Read_Mapping -V -t 1-"${Maxarray}"
        
         elif [[ "${QUEUE}" == "Slurm" ]]; then
             echo "Slurm is our workload manager/job scheduler."
             Slurm_Maxarray=$(($Maxarray-1))
-            sbatch --job-name=${PROJECT}_Read_Mapping ${RM_SBATCH} --output=${ERROR}/RM_slurm-%j.out --array=0-${Slurm_Maxarray} --export=QUEUE=${QUEUE},RM_INPUT=${RM_INPUT},RM_JOB_LOG=${RM_JOB_LOG},RM_NTHREAD=${RM_NTHREAD},FLOWCELL_NAME=${FLOWCELL_NAME},FORWARD=${FORWARD},RM_OUTPUTDIR=${RM_OUTPUTDIR},QUANT=${QUANT},PE=${PE},REVERSE=${REVERSE},GENOMIC_COORDINATE_BAMSORTED=${GENOMIC_COORDINATE_BAMSORTED},RM_PASS=${RM_PASS},MAX_MIS=${MAX_MIS},MAX_N=${MAX_N},UNMAP_F=${UNMAP_F},MINSCORE_READL=${MINSCORE_READL},MINMATCH_READL=${MINMATCH_READL},SEEDSEARCH=${SEEDSEARCH},PLATFORM=${PLATFORM},GEN_DIR=${GEN_DIR} ${SUNFLOWER_RNASEQ}/Read_Mapping.sh
+            sbatch --job-name=${PROJECT}_Read_Mapping ${RM_SBATCH} --output=${ERROR}/RM_slurm-%j.out --array=0-${Slurm_Maxarray} --export=QUEUE=${QUEUE},RM_INPUT=${RM_INPUT},RM_JOB_LOG=${RM_JOB_LOG},RM_NTHREAD=${RM_NTHREAD},FLOWCELL_NAME=${FLOWCELL_NAME},FORWARD=${FORWARD},RM_OUTPUTDIR=${RM_OUTPUTDIR},QUANT=${QUANT},PE=${PE},REVERSE=${REVERSE},GENOMIC_COORDINATE_BAMSORTED=${GENOMIC_COORDINATE_BAMSORTED},RM_PASS=${RM_PASS},MAX_MIS=${MAX_MIS},MAX_N=${MAX_N},UNMAP_F=${UNMAP_F},MINSCORE_READL=${MINSCORE_READL},MINMATCH_READL=${MINMATCH_READL},SEEDSEARCH=${SEEDSEARCH},PLATFORM=${PLATFORM},GEN_DIR=${GEN_DIR} ${DEV_RNASEQ}/Read_Mapping.sh
 fi
 
 
 
  ;;
-    7 | Merge_BAM)
-        echo "$(basename $0): Merging BAM files..." >&2
-        if [[ -f "$ID_NAMES" ]]; then
-            Maxarray=$(cat $ID_NAMES | wc -l)
-            echo "Max array index is ${Maxarray}" >&2
-            if [[ "$QUEUE" == "PBS" ]]; then
-                echo "source ${CONFIG} && source ${SUNFLOWER_RNASEQ}/Merge_BAM.sh" | qsub -l "${MB_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Merge_BAM -t 1-"${Maxarray}"
-            elif [[ "${QUEUE}" == "Slurm" ]]; then
-                echo "Slurm is our workload manager/job scheduler."
-                Slurm_Maxarray=$(($Maxarray-1))
-                sbatch --job-name=${PROJECT}_merge_BAM ${MB_SBATCH} --output=${ERROR}/MB_slurm-%j.out --array=0-${Slurm_Maxarray} --export=QUEUE=${QUEUE},MB_INPUTDIR=${MB_INPUTDIR},MB_JOB_LOG=${MB_JOB_LOG},ID_NAMES=${ID_NAMES},MB_OUTPUTDIR=${MB_OUTPUTDIR} ${SUNFLOWER_RNASEQ}/Merge_BAM.sh
-fi
-        else
-            echo "Please specify a valid file containing a list of ID names in the Config file"
-        fi
-        ;;
-    8 | Reference_Prep)
-        echo "$(basename $0): Preparing Reference for Quantification..." >&2
-        echo "source ${CONFIG} && source ${SUNFLOWER_RNASEQ}/Ref_Prep.sh" | qsub -l "${RP_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Reference_Prep
-        ;;
-    9 | Transcript_Quant)
-        if [ "$PE" == "True" ]; then
-            echo "$(basename $0): Quantifying Transcripts for PE data..." >&2
-        elif [ "$PE" == "False" ]; then
-            echo "$(basename $0): Quantifying Transcripts for SE data..." >&2
-        else
-            echo "Please specify whether data are paired-end or single-end" >&2
-            exit 1
-        fi
-        for f in $TQ_INPUTDIR/*.bam; do
-            if [[ -f "$f" ]]; then
-                files=("${files[@]}" "$f")
-            else
-                echo "$f is not a file"
-            fi
-        done
-        Maxarray=${#files[@]}
-        echo "Max array index is ${Maxarray}">&2
-        echo "source ${CONFIG} && source ${SUNFLOWER_RNASEQ}/Transcript_Quant.sh" | qsub -l "${TQ_QSUB}" -e "${ERROR}" -o "${ERROR}" -m abe -M "${EMAIL}" -N "${PROJECT}"_Transcript_Quant -t 1-"${Maxarray}"
-        ;;
-    * )
-esac
+ 

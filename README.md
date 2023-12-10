@@ -11,8 +11,8 @@ MultiQC: https://multiqc.info/
 Trimmomatic: http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/TrimmomaticManual_V0.32.pdf  
 STAR: http://chagall.med.cornell.edu/RNASEQcourse/STARmanual.pdf  
 
-To run `Sunflower_RNAseq`, use the following command, assuming you are in the `Sunflower_RNAseq` directory:  
-`./Sunflower_RNAseq.sh <handler> Config`  
+To run `dev_RNAseq`, use the following command, assuming you are in the `dev_RNAseq` directory:  
+`./dev_RNAseq.sh <handler> Config`  
 Where `<handler>` is one of the handlers listed below, and `Config` is the full file path to the configuration file
 
 ## Pre-processing
@@ -22,8 +22,8 @@ Start with raw sequence data. Simply copy this data into your working scratch di
 ## Step 1: Quality_Assessment
 Run Quality_Assessment on your raw FastQ files. 
 
-To run Quality_Assessment, all common and handler-specific variables must be defined within the configuration file. Once the variables have been defined, Quality_Assessment can be submitted to a job scheduler with the following command (assuming that you are in the directory containing `Sunflower_RNAseq`)
-`./Sunflower_RNAseq.sh Quality_Assessment Config`
+To run Quality_Assessment, all common and handler-specific variables must be defined within the configuration file. Once the variables have been defined, Quality_Assessment can be submitted to a job scheduler with the following command (assuming that you are in the directory containing `dev_RNAseq`)
+`./dev_RNAseq.sh Quality_Assessment Config`
 where `Config` is the full file path to the configuration file
 
 A directory containing your files to be analyzed must be specified in the config file. It is ok if this is a directory containing sub-directories for each sample (which is the format for raw data as it comes from Basespace).
@@ -35,8 +35,8 @@ The Adapter_Trimming handler uses Trimmomatic to trim adapter sequences from Fas
 
 The Adapter_Trimming handler can accept as input EITHER a directory (which can be to multiple sub-directories for each sample) or a text-file list of forward samples (it will find the reverse samples based on the naming suffix specified in the config file)
 
-To run Adapter_Trimming, all common and handler-specific variables must be defined within the configuration file. Once the variables have been defined, Adapter_Trimming can be submitted to a job scheduler with the following command (assuming that you are in the directory containing `Sunflower_RNAseq`)  
-`./Sunflower_RNAseq.sh Adapter_Trimming Config`  
+To run Adapter_Trimming, all common and handler-specific variables must be defined within the configuration file. Once the variables have been defined, Adapter_Trimming can be submitted to a job scheduler with the following command (assuming that you are in the directory containing `dev_RNAseq`)  
+`./dev_RNAseq.sh Adapter_Trimming Config`  
 where `Config` is the full file path to the configuration file
 
 While Trimmomatic can also perform quality trimming, the Adapter_Trimming handler used here does not use Trimmomatic's quality trimming options. Many caution against quality trimming, as it is believed to be unnecessary since read mapping approaches can take quality scores into account. If you do want to use Trimmomatic's quality trimming capabilities, the `Trimm.sh` code must be modified and new variables defined in the configuration file. Read the Trimmomatic manual for more information: http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/TrimmomaticManual_V0.32.pdf  
@@ -49,8 +49,8 @@ This handler will generate a genome index using FASTA and GFF3 or GTF formatted 
 
 If using a GFF3 file for genome indexing rather than the default GTF file, the option `--sjdbGTFtagExonParentTranscript Parent` is added to the script 
 
-To run Genome_Index, all common and handler-specific variables must be defined within the configuration file. Once the variables have been defined, Genome_Index can be submitted to a job scheduler with the following command (assuming that you are in the directory containing `Sunflower_RNAseq`)  
-`./Sunflower_RNAseq.sh Genome_Index Config`  
+To run Genome_Index, all common and handler-specific variables must be defined within the configuration file. Once the variables have been defined, Genome_Index can be submitted to a job scheduler with the following command (assuming that you are in the directory containing `dev_RNAseq_RNAseq`)  
+`./dev_RNAseq.sh Genome_Index Config`  
 where `Config` is the full file path to the configuration file.
 
 You will use the contents of the output (directory specified in the Config file) for the next step
@@ -69,8 +69,8 @@ While STAR can perform 2-pass mapping on a per-sample basis, in a study with mul
 #### Step 4a: Collect_Junctions
 This step identifies novel junctions during a first read-mapping pass and outputs them as "SJ.out.tab" files for each sample. In the handler used here, only junctions supported by at least 1 uniquely mapped read will be output. This step shares variables for Read_Mapping in the config file, so make sure these are filled out.
 
-Once the variables have been defined, Collect_Junctions can be submitted to a job scheduler with the following command (assuming that you are in the directory containing `Sunflower_RNAseq`)  
-`./Sunflower_RNAseq.sh Collect_Junctions Config`   
+Once the variables have been defined, Collect_Junctions can be submitted to a job scheduler with the following command (assuming that you are in the directory containing `dev_RNAseq`)  
+`./dev_RNAseq.sh Collect_Junctions Config`   
 where `Config` is the full file path to the configuration file.
 
 #### Step 4b: Filter_Junctions
@@ -79,8 +79,8 @@ This step will concatenate the junction files discovered in Step 4a across sampl
 2.) Filtering and concatenating junction files before mapping speeds up the mapping step in 4c - both because of the smaller number of junctions and because STAR then doesn't need to perform the concatenation across large numbers of samples for each sample separately.  
 3.) This list or lists can be more easily saved in case one wants to redo the mapping  
 
-Once the variables in the configuration file have been defined, Filter_Junctions can be submitted to a job scheduler with the following command (assuming that you are in the directory containing `Sunflower_RNAseq`)  
-`./Sunflower_RNAseq.sh Filter_Junctions Config`   
+Once the variables in the configuration file have been defined, Filter_Junctions can be submitted to a job scheduler with the following command (assuming that you are in the directory containing `dev_RNAseq`)  
+`./dev_RNAseq.sh Filter_Junctions Config`   
 where `Config` is the full file path to the configuration file.
 
 #### Step 4c: Read_Mapping  
@@ -89,13 +89,13 @@ This step will take all of the novel junctions discovered in the first pass and 
 The `FILTERED_JUNC_LIST` variable can be one of two things: 1.) The filepath to the filtered junctions file output from the "Filter_Junctions" handler. Alternatively, if you have multiple outputs from "Filter_Junctions" (if you process samples in batches like we do); this variable can be 2.) A .txt file with a list of the full filepaths to all filtered junction files to be included. STAR can handle multiple junction files as input (and will concatenate before mapping).
 As mentioned previously, this list could also just be a list of filepaths to the un-filtered, un-concatenated "SJ.out.tab" files from all samples (if skipping the "Filter_Junctions" step).
 
-To run Read_Mapping, all common and handler-specific variables must be defined within the configuration file. Once the variables have been defined, Read_Mapping can be submitted to a job scheduler with the following command (assuming that you are in the directory containing `Sunflower_RNAseq`)  
-`./Sunflower_RNAseq.sh Read_Mapping Config`   
+To run Read_Mapping, all common and handler-specific variables must be defined within the configuration file. Once the variables have been defined, Read_Mapping can be submitted to a job scheduler with the following command (assuming that you are in the directory containing `dev_RNAseq`)  
+`./dev_RNAseq.sh Read_Mapping Config`   
 where `Config` is the full file path to the configuration file.
 
 ### Option for 1-pass mapping  
-If you want to map your reads without the addition of novel junctions discovered in a first mapping step, you can skip the "Collect_Junctions" and "Filter_Junctions" steps and leave the `FILTERED_JUNC_LIST` variable blank. All other variables need to be specified for Read_Mapping in the configuration file. Once the variables have been defined, Read_Mapping can be submitted to a job scheduler with the following command (assuming that you are in the directory containing `Sunflower_RNAseq`)  
-`./Sunflower_RNAseq.sh Read_Mapping Config`   
+If you want to map your reads without the addition of novel junctions discovered in a first mapping step, you can skip the "Collect_Junctions" and "Filter_Junctions" steps and leave the `FILTERED_JUNC_LIST` variable blank. All other variables need to be specified for Read_Mapping in the configuration file. Once the variables have been defined, Read_Mapping can be submitted to a job scheduler with the following command (assuming that you are in the directory containing `dev_RNAseq`)  
+`./dev_RNAseq.sh Read_Mapping Config`   
 where `Config` is the full file path to the configuration file.
 
 ### Final Notes:  

@@ -232,7 +232,7 @@ UNIQUE_NUM=2
 
 
 ############################################
-##########    Read_Mapping        ##########
+######    Read_Mapping  and QUANT    #######
 ############################################
 
 #####IMPORTANT:
@@ -327,95 +327,6 @@ QUANT="GeneCounts"
 #	If not using additional junctions, leave blank
 FILTERED_JUNC_LIST="/scratch/ely67071/sunflower_inflo_dev_data/STAR_output/junction_data/ha412__SJ.filtered.tab"
 
-############################################
-##############    Merge_BAM   ##############
-############################################
-
-#	What are our QSub settings for Merge_BAM?
-#	Below are the recommended settings
-MB_QSUB="mem=10gb,nodes=1:ppn=4,walltime=50:00:00"
-
-#   QUEUE=Slurm: What are our sbatch settings?
-#       Below are the recommended settings
-MB_PARTITION="batch"
-MB_SBATCH="--nodes=1 --ntasks-per-node=4 --mem=100gb --time=72:00:00 --partition=${PARTITION}"
-
-#       File name/path of where JOB IDs should be recorded
-MB_JOB_LOG="/scratch/ely67071/sunflower_data2/MB_job_log.txt"
-#   What is the file name suffix for the files you are merging? 
-MB_SUFFIX="Aligned.toTranscriptome.out.bam"
-
-#   Where are the BAM files? Include the full file path
-#   Make sure that all input files are in the same directory
-MB_INPUTDIR="/scratch/ely67071/sunflower_data2/snp_calling/aligned_sorted_bam"
-
-#   Where do you want your merged bam files to go? Include the whole directory
-MB_OUTPUTDIR="/scratch/ely67071/sunflower_data2/snp_calling/merged_bam"
-
-#   You will need a .txt file with a list of ID's for each sample (1 per line)
-#	What is this file called? (Include the full directory path)
-ID_NAMES="/scratch/ely67071/sunflower_data2/snp_calling/sample_names.txt"
-
-
-############################################
-###########    Reference_Prep   ############
-############################################
-
-#####IMPORTANT:
-# The variables: 
-# "ANNOTATION_FORMAT", "GEN_ANN" and "GEN_FASTA"
-# MUST also be supplied (above, under 'reference genome info')
-
-#	What are our QSub settings for Preparing the Reference?
-#	Below are the recommended settings
-RP_QSUB="mem=50gb,nodes=1:ppn=4,walltime=450:00:00"
-
-#	Where do you want to put the RSEM reference files?
-#	Include the full filepath
-RSEM_ref=""
-
-#	What do you want to call the reference that RSEM prepares?
-#	RSEM will generate several reference-related files that are prefixed by this name
-REF_NAME=""
-
-############################################
-##########    Transcript_Quant   ###########
-############################################
-
-#####IMPORTANT:
-# The variables: 
-# "RSEM_ref", and "REF_NAME" MUST be supplied above
-
-#	What are our QSub settings for Preparing the Reference?
-#	Below are the recommended settings
-TQ_QSUB="mem=50gb,nodes=1:ppn=8,walltime=450:00:00"
-
-#	Define the number of threads to be used. 
-#	This must be set to the number of available cores on the server node
-TQ_NTHREAD=8
-
-#   Where are the merged BAM files? Include the full file path
-#   Make sure that all input files are in the same directory
-TQ_INPUTDIR=""
-
-#   Where do you want your results? Include the full file path
-TQ_OUTPUTDIR=""
-
-#   What is the strandedness of the RNA-Seq reads?
-# 	Either "none" for a non-strand-specific protocol, "forward" if all upstream reads are
-#	derived from the forward strand, or "reverse" if all upstream reads are derived from the 
-#	reverse strand. Use "reverse" for Illumina TruSeq Stranded protocols.
-STRANDEDNESS="reverse"
-
-#### Below are options to fill out ONLY if the data are single-end (these variables are ignored if paired-end)
-
-#	What is the mean of the fragment length distribution?
-FRAG_MEAN_LEN=""
-
-#	What is the standard deviation of the fragment length distribution?
-FRAG_MEAN_SD=""
-
-
 #### CURRENTLY DEPRECATED: 
 #### (MODULES SPECIFIC TO HANDLERS NOW SPECIFIED IN SCRIPT FILE)
 
@@ -424,7 +335,7 @@ FRAG_MEAN_SD=""
 ############################################
 
 #   This section defines installations to
-#   various dependencies for Sunflower_RNAseq
+#   various dependencies for dev_RNAseq
 #   With module paths specific to the Georgia Advanced Computing Resource Center (GACRC)
 
 #   Do we have FastQC installed?
