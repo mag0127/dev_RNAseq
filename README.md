@@ -114,6 +114,8 @@ The output of STAR GeneCounts must be properly formatted to read into DESEq2. Th
 # Part II: Expression Analysis 
 This will mostly be in R using [DESeq2](https://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html) for differential expression analysis and [WGCNA](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-9-559) for a co-expression network analysis. 
 
+Special note on DGE analysis: There are many, many programs that will run DGE analyses with tons of options for methods within each program (on example being edgeR)...it is crucial to understand each test and how it is handling your data in order to make a decision for which program to use. That being said, the following methods are what I found were best for my data, but there are many ways to do similar analyses. 
+
 ## 0. Pre-process data into matrix
 Load the GeneCount data into a DESeq dataset and collapse technical replicates (if applicaple)
 `load_GC_data_and_sum_reps.R`
@@ -122,6 +124,7 @@ Load the GeneCount data into a DESeq dataset and collapse technical replicates (
 This will give us an idea of the relationship between our samples. In the next step we will be correcting for varaition, but it is important to visualize at this step.
 ## 2. Correct for unwanted variation using [ComBat-Seq](https://github.com/zhangyuqing/ComBat-seq) and run DEseq
 `run_DGE_deseq_sunflower_inflo_combatseq.R`
+We will visualize the corrected samples in an MDS plot as well (compare with above). The model we are using to run the differential epxression analysis is ~0+dev_stage as we are curious about differential expression wrt dev_stage. 
 ## 3. Visualize DE in an Upset Plot
 `analyze_DGE_deseq_sunflower_inflo_combatseq.R`
 ## 4. Run and analyze WGCNA
