@@ -2,12 +2,14 @@
 A pipeline for analyzing expression across developmental stages 
 Built from Emily Dittmar's sunflower expression pipeline: https://github.com/EDitt/Sunflower_RNAseq
 
+
+# Part I: Mapping reads and quantifying transcripts
+
 ## Programs Used:  
 FASTQC: https://dnacore.missouri.edu/PDF/FastQC_Manual.pdf  
 MultiQC: https://multiqc.info/  
 Trimmomatic: http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/TrimmomaticManual_V0.32.pdf  
 STAR: http://chagall.med.cornell.edu/RNASEQcourse/STARmanual.pdf  
-RSEM: https://deweylab.github.io/RSEM/README.html
 
 To run `Sunflower_RNAseq`, use the following command, assuming you are in the `Sunflower_RNAseq` directory:  
 `./Sunflower_RNAseq.sh <handler> Config`  
@@ -102,4 +104,17 @@ If you have sequence data from the same sample across multiple lanes/runs, the b
 
 #### Alignment File Output  
 Two alignment files are output from STAR with this handler - one alignment file in genomic coordinates and one translated into transcript coordinates (e.g.`*Aligned.toTranscriptome.out.bam`). The default format of the former is an unsorted SAM file. If you plan on using the genomic coordinate alignments for SNP calling, you have the option of getting these output as coordinate-sorted BAM files (similar to the `samtools sort` command) by putting a "yes" for the `GENOMIC_COORDINATE_BAMSORTED` variable in the config. Note that this will add significant computational time and memory.
+
+## Step 5: Prepare for DESEq2
+The output of STAR GeneCounts must be properly formatted to read into DESEq2
+
+run `prepare_DESEq_input.sh`
+
+# Part II: Expression Analysis 
+This will mostly be in R 
+
+## 1. Visualize data in an MDS plot
+## 2. Correct for unwanted variation using ComBat-Seq
+## 3. Run and analyze DESeq
+## 4. Run and analyze WGCNA
 
